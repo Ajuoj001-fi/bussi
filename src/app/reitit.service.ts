@@ -28,9 +28,10 @@ export class ReititService {
 
   constructor() {}
 
-  aloitaHaku = () : void => {
-    let t0 = performance.now();
+  time : number;
 
+  aloitaHaku = () : void => {
+    this.time = 0;
     this.lyhinReitti = [{
       kuljettuReitti : null,
       linjat : null,
@@ -79,13 +80,13 @@ export class ReititService {
       });
     }
 
-    let t1 = performance.now();
-    console.log("suoritusaika", (t1-t0)," ms");
+    console.log("suoritusaika", this.time ,"loop");
     console.log(this.reitit);
   }
 
   etsiLiittymat = () : void => {
-    this.reitit.forEach((reitti) => {
+    let reitti = this.reitit.reduce((prev, curr) => prev.kuljettuMatka > curr.kuljettuMatka ? curr : prev);
+    //this.reitit.forEach((reitti) => {
 
       if(!reitti.valmis){
         let nykyinenAsema = reitti.kuljettuReitti.substr(-1);
@@ -96,7 +97,7 @@ export class ReititService {
         let alkupLinja = JSON.stringify(reitti.linjat);
 
         this.tiet.forEach((tie) => {
-
+          this.time ++;
 
           let linjanNimi = this.tarkistaLinja(tie.mista,tie.mihin)
           if(linjanNimi != null){ //tie kuuluu johonkin linjaan
@@ -144,7 +145,7 @@ export class ReititService {
           delete this.reitit[i];
         }
       }
-    });
+    //});
   }
 
   lisaaLyhyinReitti = (reitti) : void  => { //onko reitti valmis ja lyhyempi mitä nykyinen lyhyin
