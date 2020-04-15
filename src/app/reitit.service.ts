@@ -29,6 +29,8 @@ export class ReititService {
   constructor() {}
 
   aloitaHaku = () : void => {
+    let t0 = performance.now();
+
     this.lyhinReitti = [{
       kuljettuReitti : null,
       linjat : null,
@@ -53,7 +55,7 @@ export class ReititService {
             "linjat": [linjanNimi],
             "linjaparit" : [this.lahto+kohde],
             "kuljettuMatka": tie.kesto,
-            "valmis": true ? kohde == this.maali : false
+            "valmis":(kohde == this.maali)
             }
           
           this.reitit.push(uusireitti);
@@ -61,21 +63,24 @@ export class ReititService {
         }
       }
     });
-
-    let u=1;
-    for(let i=0; i<u; i++){
+    
+    let kesken = true;
+    while(kesken){
+      kesken = false;
       this.etsiLiittymat();
-      let kesken = false;
-      this.reitit.forEach((reitti) => {
+      this.reitit.forEach((reitti)=> {
+        let km = this.lyhinReitti[0].kuljettuMatka;
+        if(km != null && km <= reitti.kuljettuMatka){
+          reitti.valmis = true;
+        }
         if(!reitti.valmis){
           kesken = true;
         }
       });
-
-      if(kesken)
-        u++;
     }
 
+    let t1 = performance.now();
+    console.log("suoritusaika", (t1-t0)," ms");
     console.log(this.reitit);
   }
 
@@ -107,7 +112,7 @@ export class ReititService {
                 reitti.linjat.push(linjanNimi);
                 reitti.linjaparit.push(nykyinenAsema+kohde);
                 reitti.kuljettuMatka += tie.kesto;
-                reitti.valmis = true ? kohde == this.maali : false;
+                reitti.valmis = (kohde == this.maali)
                 yksiUusi = true;
 
                 this.lisaaLyhyinReitti(reitti);
@@ -120,7 +125,7 @@ export class ReititService {
                     "linjat": JSON.parse(alkupLinja),
                     "linjaparit": JSON.parse(alkupParit),
                     "kuljettuMatka": alkupMatka + tie.kesto,
-                    "valmis": true ? kohde == this.maali : false
+                    "valmis": (kohde == this.maali)
                   }
 
                 uusireitti.linjaparit.push(nykyinenAsema+kohde);
