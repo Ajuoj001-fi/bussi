@@ -1,9 +1,9 @@
-<div class="row">
-    <div class ="col-12 mt-3">
-        <img src="assets/koodihaaste.png" style="max-width: 100%;">
+<div class="row justify-content-center">
+    <div class ="col-6 mt-3" style="padding: 0; margin: 0; min-width: 300px;">
+        <img src="assets/koodihaaste.png" class="img-fluid">
     </div>
-    <div class ="col-12 mt-3" style="background-color: rgb(173, 204, 194);">
-        <div class="form-group" style="font-size: 22px">
+    <div class ="col-6 mt-3" style="background-color: rgb(173, 204, 194); min-width: 300px;">
+        <div class="form-group" style="font-size: 22px;">
             <label for="lahto">Lähtöasema</label>
                 <select class="form-control" [(ngModel)]="reitit.lahto" required>
                 <option *ngFor="let lahto of reitit.asemat" [value]="lahto">{{lahto}}</option>
@@ -14,29 +14,30 @@
             </select>
             <button class="m-3" (click)="reitit.aloitaHaku()">Hae reitti</button>
         </div>
-
-    <div *ngIf="reitit.lyhinReitti" style="background-color: rgb(173, 204, 194);">
-        <div *ngFor="let reitti of reitit.lyhinReitti">
-            <div style="margin-top:10px; padding: 5px; font-size: 22px; background-color: rgb(219, 219, 219);">
-                <span>
-                Lyhin reitti on: {{reitti.kuljettuReitti}}<br>
-                Matka-aika on: {{reitti.kuljettuMatka}}<br>
-                </span>
-            </div>
-
-            <div style="margin:10px; padding: 5px; font-size: 33px; background-color: rgb(219, 219, 219);">
-                <ul style="list-style-type: none;">
-                    <li *ngFor="let pari of reitti.linjaparit; let i = index"><span [ngStyle]="{'background-color':reitit.varit[reitti.linjat[i]], 'font-weight': 'bold', 'padding-top':'10px'}">
-                        <span style="font-size: 50px" >{{pari[0]}}
-                            <span class="material-icons" style="font-size: 40px">directions_bus</span>
-                            <span class="material-icons" style="font-size: 48px">trending_flat</span>
-                            <span style="font-size: 50px">{{pari[1]}}<br></span>
-                            </span>
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
+
+<div class="row justify-content-center" *ngFor="let reitti of reitit.lyhinReitti" style="margin-top:10px;">
+    <div class ="col-6" style="min-width: 300px; padding:0; margin:0; ">
+        <div style="font-size: 22px; background-color: rgb(173, 204, 194); padding: 4px; height: 100%;">
+            <span>
+            Reitti: {{reitti.kuljettuReitti}}<br>
+            Matka-aika on: {{reitti.kuljettuMatka}}<br>
+            </span>
+        </div>
+    </div>
+    <div class ="col-6" style="min-width: 300px; padding:0; margin:0; ">
+        <div style="font-size: 33px; background-color: rgb(173, 204, 194); height: 100%;">
+            <ul style="list-style-type: none;">
+                <li *ngFor="let pari of reitti.linjaparit; let i = index"><span [ngStyle]="{'background-color':reitit.varit[reitti.linjat[i]], 'font-weight': 'bold', 'padding-top':'10px'}">
+                    <span style="font-size: 50px" >{{pari[0]}}
+                        <span class="material-icons" style="font-size: 40px">directions_bus</span>
+                        <span class="material-icons" style="font-size: 48px">trending_flat</span>
+                        <span style="font-size: 50px">{{pari[1]}}<br></span>
+                        </span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

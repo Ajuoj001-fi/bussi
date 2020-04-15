@@ -22,16 +22,17 @@ export class ReititService {
   varit : Object = {
     "keltainen" :"yellow",
     "vihreä" : "green",
-    "sininen" : "blue",
+    "sininen" : "#2ddcf7",
     "punainen" : "red"
   };
 
   constructor() {}
 
-  time : number;
 
   aloitaHaku = () : void => {
-    this.time = 0;
+    if(this.lahto == null || this.maali == null || this.lahto == this.maali )
+      return;
+
     this.lyhinReitti = [{
       kuljettuReitti : null,
       linjat : null,
@@ -60,11 +61,12 @@ export class ReititService {
             }
           
           this.reitit.push(uusireitti);
-          this.lisaaLyhyinReitti(uusireitti);
+          this.lisaaLyhinReitti(uusireitti);
         }
       }
     });
-    
+
+
     let kesken = true;
     while(kesken){
       kesken = false;
@@ -80,13 +82,13 @@ export class ReititService {
       });
     }
 
-    console.log("suoritusaika", this.time ,"loop");
-    console.log(this.reitit);
+    this.yhdistaReitteja();
+
+    console.log(this.lyhinReitti);
   }
 
   etsiLiittymat = () : void => {
     let reitti = this.reitit.reduce((prev, curr) => prev.kuljettuMatka > curr.kuljettuMatka ? curr : prev);
-    //this.reitit.forEach((reitti) => {
 
       if(!reitti.valmis){
         let nykyinenAsema = reitti.kuljettuReitti.substr(-1);
@@ -97,7 +99,6 @@ export class ReititService {
         let alkupLinja = JSON.stringify(reitti.linjat);
 
         this.tiet.forEach((tie) => {
-          this.time ++;
 
           let linjanNimi = this.tarkistaLinja(tie.mista,tie.mihin)
           if(linjanNimi != null){ //tie kuuluu johonkin linjaan
@@ -116,7 +117,7 @@ export class ReititService {
                 reitti.valmis = (kohde == this.maali)
                 yksiUusi = true;
 
-                this.lisaaLyhyinReitti(reitti);
+                this.lisaaLyhinReitti(reitti);
             }else if(((tie.mista == nykyinenAsema && reittiStr.search(tie.mihin) == -1) || 
               (tie.mihin == nykyinenAsema && reittiStr.search(tie.mista) == -1)) && yksiUusi){
                 if(this.tarkistaLinja(nykyinenAsema,kohde)){
@@ -133,7 +134,7 @@ export class ReititService {
 
                 uusireitti.linjat.push(linjanNimi);
                 this.reitit.push(uusireitti);
-                this.lisaaLyhyinReitti(uusireitti);
+                this.lisaaLyhinReitti(uusireitti);
               }
             }
           }
@@ -145,10 +146,9 @@ export class ReititService {
           delete this.reitit[i];
         }
       }
-    //});
   }
 
-  lisaaLyhyinReitti = (reitti) : void  => { //onko reitti valmis ja lyhyempi mitä nykyinen lyhyin
+  lisaaLyhinReitti = (reitti) : void  => { //onko reitti valmis ja lyhyempi mitä nykyinen lyhin
     if(reitti.valmis){
       if(this.lyhinReitti[0].kuljettuMatka == null){
         this.lyhinReitti[0] = reitti;
@@ -179,5 +179,23 @@ export class ReititService {
     return result;
   }
 
+  yhdistaReitteja = () : void => { //kun jatketaan samalla linjalla useamman aseman ohi, yhdistetään ne yhdeksi
+    this.lyhinReitti.forEach((reitti) => {
+      for(let i=0; i<reitti.linjat.length;){
+        if(reitti.linjaparit[i+1]){ //jos nyt olevan parin lisäksi löytyy seuraavakin
+          if(reitti.linjat[i] == reitti.linjat[i+1]){ //jos nykyinen linja vihreä == sueraava linja vihreä
+            console.log(reitti.linjaparit[i+1]); //ce
+            let uusi = reitti.linjaparit[i].toString()[0] + reitti.linjaparit[i+1].toString()[1]; //yhdistetään nämä kaksi AC ja CE => AE
 
+            reitti.linjaparit[i] = uusi;
+            reitti.linjat.splice(i+1,1); //poistetaan "vihreä"
+            reitti.linjaparit.splice(i+1,1);  //poistetaan CE 
+            i--;
+          }
+        }
+
+        i++;
+      }
+    });
+  }
 }
